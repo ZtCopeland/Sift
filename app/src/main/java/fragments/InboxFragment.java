@@ -97,7 +97,7 @@ public class InboxFragment extends Fragment {
     private String host = "pop.gmail.com";// change accordingly
     private String mailStoreType = "pop3";
     private String username = "zach.t.copeland@gmail.com";// change accordingly
-    private String password = "blackbareantiks12345";// change accordingly
+    private String password = "";// change accordingly
     public class fetcher extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -274,7 +274,7 @@ public class InboxFragment extends Fragment {
             // SUBJECT
             if (m.getSubject() != null) {
                 System.out.println("SUBJECT: " + m.getSubject());
-                inboxList.add(m.getSubject());
+                //inboxList.add(m.getSubject());
 
             }
 
@@ -303,13 +303,3 @@ public class InboxFragment extends Fragment {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
