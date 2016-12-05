@@ -17,43 +17,28 @@ import android.widget.TextView;
 
 import com.example.caleb.sift11.MainActivity;
 import com.example.caleb.sift11.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.gmail.GmailScopes;
-import com.google.api.services.gmail.model.Label;
-import com.google.api.services.gmail.model.ListLabelsResponse;
-import com.google.api.services.gmail.model.ListMessagesResponse;
-import com.google.api.services.gmail.model.Message;
 
+
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
-import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.ExponentialBackOff;
-
 import com.google.api.services.gmail.GmailScopes;
-
-import com.google.api.services.gmail.model.*;
 
 
 import android.accounts.AccountManager;
@@ -81,6 +66,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.mail.Address;
+import javax.mail.Folder;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.NoSuchProviderException;
+import javax.mail.Part;
+import javax.mail.Session;
+import javax.mail.Store;
+
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -95,154 +90,221 @@ public class InboxFragment extends Fragment {
     private ListView inboxListView;
     private View inboxView;
 
-    private ArrayList<Message> inboxList;
-    private ArrayAdapter<Message> inboxAdapter;
+    private ArrayList<String> inboxList;
+    private ArrayAdapter<String> inboxAdapter;
     private GoogleAccountCredential creds;
     private static final String[] SCOPES = {GmailScopes.GMAIL_LABELS};
-
-    private boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(getActivity());
-        return connectionStatusCode == ConnectionResult.SUCCESS;
-    }
-
-    private void acquireGooglePlayServices() {
-        System.out.println("AGPS method");
-//        GoogleApiAvailability apiAvailability =
-//                GoogleApiAvailability.getInstance();
-//        final int connectionStatusCode =
-//                apiAvailability.isGooglePlayServicesAvailable(getActivity());
-//        if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-//            //showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
-//            System.out.println("ERROR IN GPLAY");
-//        }
-    }
-
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        System.out.println("Beginning of oncreate method");
-        acquireGooglePlayServices();
-        inboxView = inflater.inflate(R.layout.inbox_layout, container, false);
-        inboxListView = (ListView) inboxView.findViewById(R.id.inboxListView);
-        inboxList = new ArrayList<>();
-        inboxAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, inboxList);
-        inboxListView.setAdapter(inboxAdapter);
-        creds = GoogleAccountCredential.usingOAuth2(getActivity(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
-
-        String accountName = "";
-        if(EasyPermissions.hasPermissions(getActivity(), android.Manifest.permission.GET_ACCOUNTS)){
-            System.out.println("PERMISSIONS SUCCESS");
-            accountName = "zach.t.copeland@gmail.com";
-            creds.setSelectedAccountName(accountName);
-            new MakeInboxRequest(creds).execute();
-            inboxAdapter.notifyDataSetChanged();
-        }
-
-        System.out.println("accountName: " + accountName);
-        System.out.println("EXECUTED");
-        return inboxView;
-    }
-    private class MakeInboxRequest extends AsyncTask<Void, Void, List<Message>> {
-        private com.google.api.services.gmail.Gmail mService = null;
-        private Exception mLastError = null;
-
-
-        MakeInboxRequest(GoogleAccountCredential credential) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new com.google.api.services.gmail.Gmail.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Android Client 1")
-                    .build();
-
-            System.out.println("REQUEST CREATED");
-        }
-
-        /**
-         * Background task to call Gmail API.
-         * @param params no parameters needed for this task.
-         */
+    private String host = "pop.gmail.com";// change accordingly
+    private String mailStoreType = "pop3";
+    private String username = "zach.t.copeland@gmail.com";// change accordingly
+    private String password = "blackbareantiks12345";// change accordingly
+    public class fetcher extends AsyncTask<Void, Void, Void> {
         @Override
-        protected List<Message> doInBackground(Void... params) {
+        protected Void doInBackground(Void... params) {
             try {
-                return getDataFromApi();
+                fetch(host, mailStoreType, username, password);
             } catch (Exception e) {
-                mLastError = e;
-                cancel(true);
-                return null;
+                e.printStackTrace(System.out);
+
+
             }
+            return null;
         }
-        private List<Message> getDataFromApi() throws IOException {
-            System.out.println("GETTING DATA");
 
-            String userId = "me";
+        public void fetch(String pop3Host, String storeType, String user,
+                          String password) {
+            try {
+                // create properties field
+                Properties properties = new Properties();
+                properties.put("mail.store.protocol", "pop3");
+                properties.put("mail.pop3.host", pop3Host);
+                properties.put("mail.pop3.port", "995");
+                properties.put("mail.pop3.starttls.enable", "true");
+                Session emailSession = Session.getDefaultInstance(properties);
+                // emailSession.setDebug(true);
 
-            ListMessagesResponse response;
-            List<Message> messages = new ArrayList<>();
+                // create the POP3 store object and connect with the pop server
+                Store store = emailSession.getStore("pop3s");
 
-            try{
-                response = mService.users().messages().list(userId).execute();
-                while (response.getMessages() != null) {
-                    messages.addAll(response.getMessages());
-                    if (response.getNextPageToken() != null) {
-                        String pageToken = response.getNextPageToken();
-                        response = mService.users().messages().list(userId)
-                                .setPageToken(pageToken).execute();
-                    } else {
+                store.connect(pop3Host, user, password);
+
+                // create the folder object and open it
+                Folder emailFolder = store.getFolder("INBOX");
+                emailFolder.open(Folder.READ_ONLY);
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+                // retrieve the messages from the folder in an array and print it
+                Message[] messages = emailFolder.getMessages();
+                System.out.println("messages.length---" + messages.length);
+
+                for (int i = 0; i < messages.length; i++) {
+                    Message message = messages[i];
+                    System.out.println("---------------------------------");
+                    writePart(message);
+                    String line = reader.readLine();
+                    System.out.println(line);
+                    if ("YES".equals(line)) {
+                        System.out.println("Inside if");
+                        message.writeTo(System.out);
+                    } else if ("QUIT".equals(line)) {
+                        System.out.println("inside else if");
                         break;
                     }
                 }
 
-                System.out.println("GETDATAFROMAPI");
-                for (Message message : messages) {
-                    System.out.println(message.toPrettyString());
+                // close the store and folder objects
+                emailFolder.close(false);
+                store.close();
+
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public void writePart(Part p) throws Exception {
+            if (p instanceof Message)
+                //Call methos writeEnvelope
+                writeEnvelope((Message) p);
+
+            System.out.println("----------------------------");
+            System.out.println("CONTENT-TYPE: " + p.getContentType());
+
+            //check if the content is plain text
+            if (p.isMimeType("text/plain")) {
+                System.out.println("This is plain text");
+                System.out.println("---------------------------");
+                System.out.println((String) p.getContent());
+            }
+            //check if the content has attachment
+            else if (p.isMimeType("multipart/*")) {
+                System.out.println("This is a Multipart");
+                System.out.println("---------------------------");
+                Multipart mp = (Multipart) p.getContent();
+                int count = mp.getCount();
+                for (int i = 0; i < count; i++)
+                    writePart(mp.getBodyPart(i));
+            }
+            //check if the content is a nested message
+            else if (p.isMimeType("message/rfc822")) {
+                System.out.println("This is a Nested Message");
+                System.out.println("---------------------------");
+                writePart((Part) p.getContent());
+            }
+            //check if the content is an inline image
+            else if (p.isMimeType("image/jpeg")) {
+                System.out.println("--------> image/jpeg");
+                Object o = p.getContent();
+
+                InputStream x = (InputStream) o;
+                // Construct the required byte array
+                System.out.println("x.length = " + x.available());
+                byte[] bArray = new byte[x.available()];
+
+                while (x.available() > 0) {
+                    int result = x.read(bArray);
                 }
-
-            }catch(Exception e){
-                System.out.println("FAILED:");
-                e.printStackTrace(System.out);
+                FileOutputStream f2 = new FileOutputStream("/tmp/image.jpg");
+                f2.write(bArray);
             }
-            return messages;
-        }
+            else if (p.getContentType().contains("image/")) {
+                System.out.println("content type" + p.getContentType());
+                File f = new File("image" + new Date().getTime() + ".jpg");
+                DataOutputStream output = new DataOutputStream(
+                        new BufferedOutputStream(new FileOutputStream(f)));
+                com.sun.mail.util.BASE64DecoderStream test =
+                        (com.sun.mail.util.BASE64DecoderStream) p
+                                .getContent();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = test.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesRead);
+                }
+            }
+            else {
+                Object o = p.getContent();
+                if (o instanceof String) {
+                    System.out.println("This is a string");
+                    System.out.println("---------------------------");
+                    System.out.println((String) o);
+                }
+                else if (o instanceof InputStream) {
+                    System.out.println("This is just an input stream");
+                    System.out.println("---------------------------");
+                    InputStream is = (InputStream) o;
+                    is = (InputStream) o;
+                    int c;
+                    while ((c = is.read()) != -1)
+                        System.out.write(c);
+                }
+                else {
+                    System.out.println("This is an unknown type");
+                    System.out.println("---------------------------");
+                    System.out.println(o.toString());
+                }
+            }
 
-        /**
-         * Fetch a list of Gmail labels attached to the specified account.
-         * @return List of Strings labels.
-         * @throws IOException
-         */
+        }
         /*
-        private List<Message> getDataFromApi() throws IOException {
-            // Get the labels in the user's account.
-            System.out.println("beginning of getdatafromapi, bitches");
-            String user = "me";
-            ListMessagesResponse listResponse =
-                    mService.users().messages().list(user).execute();
-            System.out.println(listResponse.getMessages().get(0));
-            for (Message label : listResponse.getMessages()) {
-                System.out.println("Hello");
-                //inboxList.add(label.());
-            }
-            return inboxList;
-        }
+        * This method would print FROM,TO and SUBJECT of the message
         */
+        public void writeEnvelope(Message m) throws Exception {
+            System.out.println("This is the message envelope");
+            System.out.println("---------------------------");
+            Address[] a;
 
+            // FROM
+            if ((a = m.getFrom()) != null) {
+                for (int j = 0; j < a.length; j++)
+                    System.out.println("FROM: " + a[j].toString());
+            }
 
-        @Override
-        protected void onPreExecute() {
+            // TO
+            if ((a = m.getRecipients(Message.RecipientType.TO)) != null) {
+                for (int j = 0; j < a.length; j++)
+                    System.out.println("TO: " + a[j].toString());
+            }
 
-        }
+            // SUBJECT
+            if (m.getSubject() != null) {
+                System.out.println("SUBJECT: " + m.getSubject());
+                inboxList.add(m.getSubject());
 
-        @Override
-        protected void onPostExecute(List<Message> output) {
+            }
 
-        }
-
-        @Override
-        protected void onCancelled() {
         }
     }
+
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        System.out.println("Beginning of oncreate method");
+
+        new fetcher().execute();
+        //Call method fetch
+        inboxView = inflater.inflate(R.layout.inbox_layout, container, false);
+        inboxListView = (ListView) inboxView.findViewById(R.id.inboxListView);
+        inboxList = new ArrayList<>();
+        inboxList.add("hello");
+        inboxAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, inboxList);
+        inboxListView.setAdapter(inboxAdapter);
+        inboxAdapter.notifyDataSetChanged();
+        for (String i: inboxList){
+            System.out.println(i);
+        }
+
+        return inboxView;
+
+
+    }
+
 }
+
+
 
 
 
