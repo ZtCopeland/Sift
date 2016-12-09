@@ -31,6 +31,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         temp.setdRecipient(i.getAllRecipients().toString());
                         temp.setdMessage(i.getContent().toString());
                         temp.setdSender(i.getFrom().toString());
-                        //System.out.println(temp.getdSubject());
+                        System.out.println(i.getFrom());
                         temp.setdDate(i.getSentDate().toString());
                         emailList.add(temp);
                         //System.out.println(i.getSubject());
@@ -408,6 +409,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        TextView welcome = (TextView) findViewById(R.id.tvWelcome);
+        welcome.setVisibility(View.INVISIBLE);
         FragmentManager fm = getFragmentManager();
 
         if (id == R.id.nav_inbox) {
@@ -415,6 +418,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             fm.beginTransaction().replace(R.id.content_frame, new InboxFragment()).commit();
         } else if (id == R.id.nav_sent) {
             fm.beginTransaction().replace(R.id.content_frame, new SentFragment()).commit();
+
         } else if (id == R.id.nav_drafts) {
             fm.beginTransaction().replace(R.id.content_frame, new DraftsFragment()).commit();
         } else if (id == R.id.nav_trash) {

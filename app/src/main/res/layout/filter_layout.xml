@@ -2,4 +2,73 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etSearchFilter"
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/radG">
+
+        <RadioButton
+            android:text="Email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rdEmail"
+            android:layout_weight="1"
+            android:textSize="12sp" />
+
+        <RadioButton
+            android:text="Images"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rdImages"
+            android:layout_weight="1"
+            android:textSize="12sp"/>
+
+        <RadioButton
+            android:text="Attachments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rdAttachments"
+            android:layout_weight="1"
+            android:textSize="12sp"/>
+
+        <RadioButton
+            android:text="None"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rdNone"
+            android:layout_weight="1"
+            android:textSize="12sp"
+            android:checked="true" />
+    </RadioGroup>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:inputType="textPersonName"
+        android:text=""
+        android:ems="10"
+        android:drawableLeft="@android:drawable/ic_menu_search"
+        android:textSize="16sp"
+        android:id="@+id/etSearchFilter"
+        android:hint="Search"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="430dp"
+        android:id="@+id/lvFilter"
+        android:layout_marginTop="109dp"
+        android:layout_below="@+id/radioGroup"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+
 </RelativeLayout>

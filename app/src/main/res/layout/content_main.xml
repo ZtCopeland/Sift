@@ -19,4 +19,17 @@
         android:layout_height="match_parent">
 
     </FrameLayout>
+
+    <TextView
+        android:textSize="30sp"
+        android:text="Welcome To Sift!"
+        android:layout_width="252dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvWelcome"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginBottom="429dp" />
 </RelativeLayout>
