@@ -148,6 +148,7 @@ public class TrashFragment extends Fragment {
             delete.setTag(new Integer(position));
             delete.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View view){
+                    //Permanently delete mail here
                     Toast.makeText(getActivity(), "Trash permanently deleted", Toast.LENGTH_SHORT).show();
                     int d = (Integer)(view.getTag());
                     trash.remove(d);
@@ -158,7 +159,7 @@ public class TrashFragment extends Fragment {
             //Fill the View
 
             //Recipient(s)
-            TextView list_recipient = (TextView) itemView.findViewById(R.id.item_recipient);
+            TextView list_recipient = (TextView) itemView.findViewById(R.id.item_i_recipients);
             list_recipient.setText("To: " + currentTrash.getdRecipient());
 
             //Subject
@@ -172,7 +173,7 @@ public class TrashFragment extends Fragment {
             String sub = tempS.substring(0, 25);
             if(currentTrash.getdSubject().length()>25)
                 sub +=" . . .";
-            TextView list_subject = (TextView) itemView.findViewById(R.id.item_subject);
+            TextView list_subject = (TextView) itemView.findViewById(R.id.item_i_subject);
             list_subject.setText(sub);
 
             //Start of message

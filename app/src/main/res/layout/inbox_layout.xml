@@ -17,15 +17,17 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="430dp"
-        android:id="@+id/inboxListView" />
-
     <Button
         android:text="Refresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:onClick="refreshing"
+        android:id="@+id/btnRefresh" />
 
-        android:id="@+id/InboxBtnRefresh" />
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="430dp"
+        android:id="@+id/lvInbox" />
+
 </LinearLayout>

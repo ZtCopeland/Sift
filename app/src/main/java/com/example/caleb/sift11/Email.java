@@ -14,6 +14,7 @@ public class Email {
     private String dSubject;
     private String dMessage;
     private String dDate;
+    private String dSender;
     DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
     Date date = new Date();
 
@@ -80,6 +81,10 @@ public class Email {
     public void setdDate(String dDate) {
         this.dDate = dDate;
     }
+
+    public void setdSender(String dSender) { this.dSender = dSender; }
+
+    public String getdSender () { return dSender; }
 
     public String toString()
     {

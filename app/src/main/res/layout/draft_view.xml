@@ -16,7 +16,7 @@
         android:text="subject"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/item_subject"
+        android:id="@+id/item_i_subject"
         android:textSize="20dp"
         android:layout_below="@+id/item_date"
         android:layout_alignParentStart="true"
@@ -26,8 +26,8 @@
         android:text="Recipient(s) shown here"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/item_recipient"
-        android:layout_below="@+id/item_subject"
+        android:id="@+id/item_i_recipients"
+        android:layout_below="@+id/item_i_subject"
         android:layout_alignParentStart="true" />
 
     <TextView
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/item_start"
-        android:layout_below="@+id/item_recipient"
+        android:layout_below="@+id/item_i_recipients"
         android:layout_alignParentStart="true" />
 
     <ImageView
@@ -52,7 +52,7 @@
         android:minHeight="20dp"
         android:maxWidth="20dp"
         android:minWidth="20dp"
-        android:layout_alignTop="@+id/item_subject"
+        android:layout_alignTop="@+id/item_i_subject"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="14dp" />
 

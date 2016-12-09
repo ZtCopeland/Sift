@@ -132,7 +132,7 @@ public class SendFragment extends Fragment implements View.OnClickListener{
         String message = editTextMessage.getText().toString().trim();
 
         if(isValid(recipient)){
-            SendMail sm = new SendMail(getContext(), recipient, subject, message);
+            SendMail sm = new SendMail(getActivity(), recipient, subject, message);
 
             //Executing sendmail to send email
             sm.execute();

@@ -2,14 +2,9 @@ package fragments;
 
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,19 +17,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.caleb.sift11.Email;
-import com.example.caleb.sift11.MainActivity;
 import com.example.caleb.sift11.R;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.jar.Pack200;
 
-import static android.R.id.message;
-
-import static com.example.caleb.sift11.R.id.editTextEmail;
 import static com.example.caleb.sift11.R.layout.drafts_layout;
-import static com.example.caleb.sift11.R.layout.send_layout;
 
 import static fragments.SendFragment.setsMessage;
 import static fragments.SendFragment.setsRecipient;
@@ -204,7 +193,7 @@ public class DraftsFragment extends Fragment {
             //Fill the View
 
             //Recipient(s)
-            TextView list_recipient = (TextView) itemView.findViewById(R.id.item_recipient);
+            TextView list_recipient = (TextView) itemView.findViewById(R.id.item_i_recipients);
             list_recipient.setText("To: " + currentDraft.getdRecipient());
 
             //Subject
@@ -218,7 +207,7 @@ public class DraftsFragment extends Fragment {
             String sub = tempS.substring(0, 25);
             if(currentDraft.getdSubject().length()>25)
                 sub +=" . . .";
-            TextView list_subject = (TextView) itemView.findViewById(R.id.item_subject);
+            TextView list_subject = (TextView) itemView.findViewById(R.id.item_i_subject);
             list_subject.setText(sub);
 
             //Start of message
