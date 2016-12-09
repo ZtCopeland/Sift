@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         temp.setdRecipient(i.getAllRecipients().toString());
                         temp.setdMessage(i.getContent().toString());
                         temp.setdSender(i.getFrom().toString());
-                        System.out.println(i.getFrom());
+                        //System.out.println(temp.getdSubject());
                         temp.setdDate(i.getSentDate().toString());
                         emailList.add(temp);
                         //System.out.println(i.getSubject());

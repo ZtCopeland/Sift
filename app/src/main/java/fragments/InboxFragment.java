@@ -40,10 +40,10 @@ public class InboxFragment extends Fragment {
 
         @Override
         public int compare(Email e1, Email e2){
-            if(e1.getdMessage().startsWith(match)){
+            if(e1.getdSubject().startsWith(match)){
                 return 1;
             }
-            if(e2.getdMessage().startsWith(match)){
+            if(e2.getdSubject().startsWith(match)){
                 return 1;
             }
             return -1;
@@ -64,13 +64,13 @@ public class InboxFragment extends Fragment {
 
         cloneInbox(inboxList);
         //Email sortingEmail = new Email("","","hello");
-        Collections.sort(inboxList, new startsWithComparator("hello"));
+        System.out.println("BEFORE SORT: " + inboxList.get(0).getdSubject());
+        Collections.sort(inboxList, new startsWithComparator("Experticity"));
+        System.out.println("AFTER SORT: " + inboxList.get(0).getdSubject());
         //inboxList.sort(startsWithComparator(sortingEmail));
         cloneInbox(tempInbox);
 
-        for (Email i : inboxList){
-            System.out.println(i.getdSubject());
-        }
+
         ListView list = (ListView) inboxView.findViewById(R.id.lvInbox);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
